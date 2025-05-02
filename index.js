@@ -2,6 +2,8 @@ const http = require('http');
 const dotenv = require('dotenv');
 const EventEmitter = require('events');
 const Router = require('./framework/router');
+const mainApp = require('./framework/mainApp');
+const routersForUsers = require('./src/routersForUsers');
 
 
 dotenv.config();
@@ -9,24 +11,11 @@ dotenv.config();
 const event = new EventEmitter();
 const PORT = process.env.PORT || 5000;
 
-const router = new Router();
+const app = new mainApp()
 
-router.get('/user', (req,res)=> {
-    res.end('YOU SEND REQUEST TO /USER')
-})
+app.addRout(routersForUsers);
 
-router.get('/posts', (req,res)=> {
-    res.end('YOU SEND REQUEST TO /POSTS')
-})
 
-const server = http.createServer((req,res) => {
-    const isEventReal = event.emit(`[${req.url}]:[${req.method}]`,req,res)
-    if(!isEventReal) {
-        res.end();
-    }
-    // res.end(req.url);
-})
-
-server.listen(PORT, ()=> {
-    console.log(`Server was start with port: ${PORT}`);
-})
+app._listen(PORT, () => {
+    console.log('Server is starting');
+});

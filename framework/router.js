@@ -14,10 +14,6 @@ module.exports = class Router {
         }
 
         endpoint[method] = handler;
-
-        // event.on(`[${path}]:[${method}]`, (req,res) => {
-        //     handler(req,res)
-        // })
     }
 
     get(path, handler) {
