@@ -1,19 +1,17 @@
-const http = require('http');
 const dotenv = require('dotenv');
-const EventEmitter = require('events');
-const Router = require('./framework/Router');
 const mainApp = require('./framework/mainApp');
 const routersForUsers = require('./src/routersForUsers');
-const jsonParse = require('./framework/middlewareParseJson')
+const jsonParse = require('./framework/middlewareParseJson');
+const PARSE_URL = require('./framework/parseUrl');
 
 dotenv.config();
 
-const event = new EventEmitter();
 const PORT = process.env.PORT || 5000;
 
 const app = new mainApp()
 
 app.addMiddleWare(jsonParse);
+app.addMiddleWare(PARSE_URL(`http://localhost:${PORT}`));
 app.addRout(routersForUsers);
 
 

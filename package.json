@@ -20,6 +20,7 @@
   "homepage": "https://github.com/opjs105rogue/framework#readme",
   "dependencies": {
     "dotenv": "^16.5.0",
+    "mongoose": "^8.14.1",
     "nodemon": "^3.1.10"
   }
 }

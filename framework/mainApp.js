@@ -1,7 +1,5 @@
 const http = require('http');
-const EventEmitter = require('events');
-const path = require('path');
-const parseBody = require('./bodyParseJson');
+const EventEmitter = require('events');                                  
 
 module.exports = class mainApp {
     constructor() {
@@ -11,13 +9,22 @@ module.exports = class mainApp {
     }
 
     _createServer() {
-        return http.createServer(async (req, res) => {
-            await parseBody(req, res); 
-            const isEventReal = this.event.emit(this._getArgsRout(req.url, req.method), req, res);
-            if (!isEventReal) {
-                res.end('Event not created');
+        return http.createServer((req,res) => {
+            let body = '';
+            req.on('data', (chunk) => {
+                body+=chunk;
+            })
+            req.on('end', ()=> {
+                if(body) {
+                    req.body = JSON.parse(body);
+                }
+                this.middlewares.forEach((middleware) => {middleware(req,res)});
+                const isEventReal = this.event.emit(this._getArgsRout(req.pathname, req.method),req,res)
+                if(!isEventReal) {
+                    res.end();
             }
-        });
+            })
+        })
     }
 
     addMiddleWare(middleware) {
@@ -34,7 +41,6 @@ module.exports = class mainApp {
             Object.keys(endpoint).forEach((method) => {
                 this.event.on(this._getArgsRout(path, method), (req,res) => {
                     const handler = endpoint[method];
-                    this.middlewares.forEach((middleware) => {middleware(req,res)});
                     handler(req,res)
                 })
             })
