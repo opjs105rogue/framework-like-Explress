@@ -12,11 +12,19 @@ module.exports = class mainApp {
 
     _createServer() {
         return http.createServer((req,res) => {
-            const isEventReal = this.event.emit(this._getArgsRout(req.url, req.method),req,res)
-            if(!isEventReal) {
-                res.end('Event not created');
+            let body = '';
+            req.on('data', (chunk) => {
+                body+=chunk;
+            })
+            req.on('end', ()=> {
+                if(body) {
+                    req.body = JSON.parse(body);
+                }
+                const isEventReal = this.event.emit(this._getArgsRout(req.url, req.method),req,res)
+                if(!isEventReal) {
+                    res.end('Event not created');
             }
-            // res.end(req.url);
+            })
         })
     }
 
