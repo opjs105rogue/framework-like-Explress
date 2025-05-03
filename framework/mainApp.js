@@ -1,7 +1,7 @@
 const http = require('http');
 const EventEmitter = require('events');
 const path = require('path');
-
+const parseBody = require('./bodyParseJson');
 
 module.exports = class mainApp {
     constructor() {
@@ -11,21 +11,13 @@ module.exports = class mainApp {
     }
 
     _createServer() {
-        return http.createServer((req,res) => {
-            let body = '';
-            req.on('data', (chunk) => {
-                body+=chunk;
-            })
-            req.on('end', ()=> {
-                if(body) {
-                    req.body = JSON.parse(body);
-                }
-                const isEventReal = this.event.emit(this._getArgsRout(req.url, req.method),req,res)
-                if(!isEventReal) {
-                    res.end('Event not created');
+        return http.createServer(async (req, res) => {
+            await parseBody(req, res); 
+            const isEventReal = this.event.emit(this._getArgsRout(req.url, req.method), req, res);
+            if (!isEventReal) {
+                res.end('Event not created');
             }
-            })
-        })
+        });
     }
 
     addMiddleWare(middleware) {
