@@ -1,21 +1,17 @@
-const users = [
-    {id:1, name: 'Anton'},
-    {id:2, name: 'Yuri'},
-    {id:3, name: 'Pavel'},
+const User = require("../userSchema.js");
 
-]
-
-const getUser = (req,res)=> {
+const getUser = async (req,res)=> {
+    let users;
     if(req.params.id) {
-        return res.send(users.find(user => user.id == req.params.id))
-    }
-    res.send(users)
+        users = await User.findById(req.params.id);
+    } else {
+        users = await User.find();
+        }
+    res.send(users);
 }
 
-const createUser = (req,res)=> {
-    console.log(req.body);
-    const user = req.body;
-    users.push(user);
+const createUser = async (req,res)=> {
+    const users = await User.create(req.body);
     res.send(users)
 }
 
